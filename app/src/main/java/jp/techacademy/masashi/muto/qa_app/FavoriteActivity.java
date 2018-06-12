@@ -69,7 +69,6 @@ public class FavoriteActivity extends AppCompatActivity  {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap<String, HashMap<String, Object>> map = (HashMap) dataSnapshot.getValue();
-            String genre = (String) map.get("Genre");
 
             for (Question question : mQuestionArrayList) {
                 if (dataSnapshot.getKey().equals(question.getQuestionUid())) {
@@ -88,6 +87,7 @@ public class FavoriteActivity extends AppCompatActivity  {
                     }
 
                     mAdapter.notifyDataSetChanged();
+                }
             }
 
             ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
@@ -167,10 +167,10 @@ public class FavoriteActivity extends AppCompatActivity  {
         mListView.setAdapter(mAdapter);
 
         if (mFavoriteRef != null) {
-            mFavoriteRef.removeEventListener(mEventListener);
+            mFavoriteRef.removeEventListener(mIsFavoriteListener);
         }
         mFavoriteRef = mDatabaseReference.child(Const.FavoritePATH).child(user.getUid()).child(String.valueOf(mGenre));
-        mFavoriteRef.addChildEventListener(mEventListener);
+        mFavoriteRef.addChildEventListener(mIsFavoriteListener);
 
         if (mGenreRef != null) {
             mGenreRef.removeEventListener(mEventListener);
