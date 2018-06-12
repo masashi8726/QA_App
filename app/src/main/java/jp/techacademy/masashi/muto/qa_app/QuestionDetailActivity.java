@@ -28,7 +28,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private Question mQuestion;
     private QuestionDetailListAdapter mAdapter;
     private Button mFavoriteButton;
-    private Favorite mFavorite;
     DatabaseReference mDataBaseReference = FirebaseDatabase.getInstance().getReference();
     DatabaseReference favoriteRef;
 

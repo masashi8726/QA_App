@@ -183,9 +183,10 @@ public class MainActivity extends AppCompatActivity
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-
-        } else {
-
+            NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
+            Menu menu = navigationView.getMenu();
+            MenuItem menuItemFavorite = menu.findItem(R.id.nav_favorite);
+            menuItemFavorite.setVisible(false);
         }
     }
 

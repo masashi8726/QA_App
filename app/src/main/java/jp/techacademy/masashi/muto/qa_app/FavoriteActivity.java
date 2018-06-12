@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.animation.AnimationSet;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -30,16 +28,67 @@ public class FavoriteActivity extends AppCompatActivity  {
     private int mGenre = 0;
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mFavoriteRef;
+    private DatabaseReference mGenreRef;
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
+    private ArrayList<String> mFavoriteQuestionUidList;
     private QuestionsListAdapter mAdapter;
 
-    private ChildEventListener mEventListener = new ChildEventListener() {
+    private ChildEventListener mIsFavoriteListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap map = (HashMap) dataSnapshot.getValue();
             String questionUid = dataSnapshot.getKey();
             String genre = (String) map.get("Genre");
+
+            mFavoriteQuestionUidList.add();
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private ChildEventListener mEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            HashMap<String, HashMap<String, Object>> map = (HashMap) dataSnapshot.getValue();
+            String genre = (String) map.get("Genre");
+
+            for (Question question : mQuestionArrayList) {
+                if (dataSnapshot.getKey().equals(question.getQuestionUid())) {
+                    question.getAnswers().clear();
+                    HashMap answerMap = (HashMap) map.get("answers");
+                    if (answerMap != null) {
+                        for (Object key : answerMap.keySet()) {
+                            HashMap temp = (HashMap) answerMap.get((String) key);
+                            String answerBody = (String) temp.get("body");
+                            String answerName = (String) temp.get("name");
+                            String answerUid = (String) temp.get("uid");
+                            Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
+
+                            question.getAnswers().add(answer);
+                        }
+                    }
+
+                    mAdapter.notifyDataSetChanged();
+            }
 
             ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
             HashMap answerMap = (HashMap) map.get("answers");
@@ -54,7 +103,7 @@ public class FavoriteActivity extends AppCompatActivity  {
                 }
             }
 
-            Question question = new Question(dataSnapshot.getKey(), mGenre, answerArrayList);
+            Question question = new Question(title,body,name,uid,dataSnapshot.getKey(), genre, answerArrayList);
             mQuestionArrayList.add(question);
             mAdapter.notifyDataSetChanged();
         }
@@ -122,6 +171,12 @@ public class FavoriteActivity extends AppCompatActivity  {
         }
         mFavoriteRef = mDatabaseReference.child(Const.FavoritePATH).child(user.getUid()).child(String.valueOf(mGenre));
         mFavoriteRef.addChildEventListener(mEventListener);
+
+        if (mGenreRef != null) {
+            mGenreRef.removeEventListener(mEventListener);
+        }
+        mGenreRef = mDatabaseReference.child(Const.ContentsPATH);
+        mGenreRef.addChildEventListener(mEventListener);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
