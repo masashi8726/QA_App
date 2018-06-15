@@ -39,9 +39,8 @@ public class FavoriteActivity extends AppCompatActivity  {
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap map = (HashMap) dataSnapshot.getValue();
             String questionUid = dataSnapshot.getKey();
-            String genre = (String) map.get("Genre");
 
-            mFavoriteQuestionUidList.add();
+            mFavoriteQuestionUidList.add(questionUid);
         }
 
         @Override
@@ -68,26 +67,17 @@ public class FavoriteActivity extends AppCompatActivity  {
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap<String, HashMap<String, Object>> map = (HashMap) dataSnapshot.getValue();
-
-            for (Question question : mQuestionArrayList) {
-                if (dataSnapshot.getKey().equals(question.getQuestionUid())) {
-                    question.getAnswers().clear();
-                    HashMap answerMap = (HashMap) map.get("answers");
-                    if (answerMap != null) {
-                        for (Object key : answerMap.keySet()) {
-                            HashMap temp = (HashMap) answerMap.get((String) key);
-                            String answerBody = (String) temp.get("body");
-                            String answerName = (String) temp.get("name");
-                            String answerUid = (String) temp.get("uid");
-                            Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
-
-                            question.getAnswers().add(answer);
-                        }
-                    }
-
-                    mAdapter.notifyDataSetChanged();
-                }
+            HashMap<String, HashMap<String, Object>> map = (HashMap<String, HashMap<String, Object>>) dataSnapshot.getValue();
+            String title = (String) map.get().get("title");
+            String body = (String) map.get().get("body");
+            String name = (String) map.get().get("name");
+            String uid = (String) map.get("uid");
+            String imageString = (String) map.get("image");
+            byte[] bytes;
+            if (imageString != null) {
+                bytes = Base64.decode(imageString, Base64.DEFAULT);
+            } else {
+                bytes = new byte[0];
             }
 
             ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
@@ -103,8 +93,10 @@ public class FavoriteActivity extends AppCompatActivity  {
                 }
             }
 
-            Question question = new Question(title,body,name,uid,dataSnapshot.getKey(), genre, answerArrayList);
-            mQuestionArrayList.add(question);
+            Question question = new Question(title,body,name,uid,dataSnapshot.getKey(),mGenre, bytes,answerArrayList);
+            if (mFavoriteQuestionUidList.contains(dataSnapshot.getKey())) {
+                mQuestionArrayList.add(question);
+            }
             mAdapter.notifyDataSetChanged();
         }
 
@@ -169,7 +161,7 @@ public class FavoriteActivity extends AppCompatActivity  {
         if (mFavoriteRef != null) {
             mFavoriteRef.removeEventListener(mIsFavoriteListener);
         }
-        mFavoriteRef = mDatabaseReference.child(Const.FavoritePATH).child(user.getUid()).child(String.valueOf(mGenre));
+        mFavoriteRef = mDatabaseReference.child(Const.FavoritePATH).child(user.getUid());
         mFavoriteRef.addChildEventListener(mIsFavoriteListener);
 
         if (mGenreRef != null) {
