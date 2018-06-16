@@ -67,7 +67,9 @@ public class FavoriteActivity extends AppCompatActivity  {
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap<String, Object> map = (HashMap<String, Object>) dataSnapshot.getValue();
+            HashMap<String, HashMap<String,String>> map = (HashMap) dataSnapshot.getValue();
+            int[] mGenre = {1, 2, 3, 4};
+            for (mGenre :mGenre<4  )
             String title = (String) map.get("title");
             String body = (String) map.get("body");
             String name = (String) map.get("name");
@@ -168,8 +170,8 @@ public class FavoriteActivity extends AppCompatActivity  {
         if (mGenreRef != null) {
             mGenreRef.removeEventListener(mEventListener);
         }
-        for (mGenre)
-            mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+
+        mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
         mGenreRef.addChildEventListener(mEventListener);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
