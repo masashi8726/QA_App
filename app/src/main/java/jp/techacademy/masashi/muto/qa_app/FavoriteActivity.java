@@ -30,8 +30,8 @@ public class FavoriteActivity extends AppCompatActivity  {
     private DatabaseReference mFavoriteRef;
     private DatabaseReference mGenreRef;
     private ListView mListView;
-    private ArrayList<Question> mQuestionArrayList;
-    private ArrayList<String> mFavoriteQuestionUidList;
+    private ArrayList<Question> mQuestionArrayList = new ArrayList<>();
+    private ArrayList<String> mFavoriteQuestionUidList= new ArrayList<>();
     private QuestionsListAdapter mAdapter;
 
     private ChildEventListener mIsFavoriteListener = new ChildEventListener() {
@@ -67,10 +67,10 @@ public class FavoriteActivity extends AppCompatActivity  {
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap<String, HashMap<String, Object>> map = (HashMap<String, HashMap<String, Object>>) dataSnapshot.getValue();
-            String title = (String) map.get().get("title");
-            String body = (String) map.get().get("body");
-            String name = (String) map.get().get("name");
+            HashMap<String, Object> map = (HashMap<String, Object>) dataSnapshot.getValue();
+            String title = (String) map.get("title");
+            String body = (String) map.get("body");
+            String name = (String) map.get("name");
             String uid = (String) map.get("uid");
             String imageString = (String) map.get("image");
             byte[] bytes;
@@ -95,6 +95,7 @@ public class FavoriteActivity extends AppCompatActivity  {
 
             Question question = new Question(title,body,name,uid,dataSnapshot.getKey(),mGenre, bytes,answerArrayList);
             if (mFavoriteQuestionUidList.contains(dataSnapshot.getKey())) {
+
                 mQuestionArrayList.add(question);
             }
             mAdapter.notifyDataSetChanged();
@@ -167,7 +168,8 @@ public class FavoriteActivity extends AppCompatActivity  {
         if (mGenreRef != null) {
             mGenreRef.removeEventListener(mEventListener);
         }
-        mGenreRef = mDatabaseReference.child(Const.ContentsPATH);
+        for (mGenre)
+            mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
         mGenreRef.addChildEventListener(mEventListener);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
