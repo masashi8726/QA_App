@@ -69,8 +69,8 @@ public class FavoriteActivity extends AppCompatActivity  {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap<String, HashMap<String,String>> map = (HashMap) dataSnapshot.getValue();
-            for (Object questions :map.values()) {
-                Map qData = (Map) questions;
+            for (Map.Entry<String, HashMap<String, String>> questionData : map.entrySet()) {
+                Map qData = (Map) questionData.getValue();
                 String title = (String) qData.get("title");
                 String body = (String) qData.get("body");
                 String name = (String) qData.get("name");
@@ -97,7 +97,7 @@ public class FavoriteActivity extends AppCompatActivity  {
                 }
 
                 Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
-                if (mFavoriteQuestionUidList.contains(dataSnapshot.getKey())) {
+                if (mFavoriteQuestionUidList.contains(questionData.getKey())) {
 
                     mQuestionArrayList.add(question);
                 }
@@ -173,7 +173,7 @@ public class FavoriteActivity extends AppCompatActivity  {
             mGenreRef.removeEventListener(mEventListener);
         }
 
-        mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+        mGenreRef = mDatabaseReference.child(Const.ContentsPATH);
         mGenreRef.addChildEventListener(mEventListener);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
