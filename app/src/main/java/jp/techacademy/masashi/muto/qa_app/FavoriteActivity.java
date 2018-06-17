@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FavoriteActivity extends AppCompatActivity  {
 
@@ -68,39 +69,40 @@ public class FavoriteActivity extends AppCompatActivity  {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap<String, HashMap<String,String>> map = (HashMap) dataSnapshot.getValue();
-            int[] mGenre = {1, 2, 3, 4};
-            for (mGenre :mGenre<4  )
-            String title = (String) map.get("title");
-            String body = (String) map.get("body");
-            String name = (String) map.get("name");
-            String uid = (String) map.get("uid");
-            String imageString = (String) map.get("image");
-            byte[] bytes;
-            if (imageString != null) {
-                bytes = Base64.decode(imageString, Base64.DEFAULT);
-            } else {
-                bytes = new byte[0];
-            }
-
-            ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
-            HashMap answerMap = (HashMap) map.get("answers");
-            if (answerMap != null) {
-                for (Object key : answerMap.keySet()) {
-                    HashMap temp = (HashMap) answerMap.get((String) key);
-                    String answerBody = (String) temp.get("body");
-                    String answerName = (String) temp.get("name");
-                    String answerUid = (String) temp.get("uid");
-                    Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
-                    answerArrayList.add(answer);
+            for (Object questions :map.values()) {
+                Map qData = (Map) questions;
+                String title = (String) qData.get("title");
+                String body = (String) qData.get("body");
+                String name = (String) qData.get("name");
+                String uid = (String) qData.get("uid");
+                String imageString = (String) qData.get("image");
+                byte[] bytes;
+                if (imageString != null) {
+                    bytes = Base64.decode(imageString, Base64.DEFAULT);
+                } else {
+                    bytes = new byte[0];
                 }
-            }
 
-            Question question = new Question(title,body,name,uid,dataSnapshot.getKey(),mGenre, bytes,answerArrayList);
-            if (mFavoriteQuestionUidList.contains(dataSnapshot.getKey())) {
+                ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
+                HashMap answerMap = (HashMap) map.get("answers");
+                if (answerMap != null) {
+                    for (Object key : answerMap.keySet()) {
+                        HashMap temp = (HashMap) answerMap.get((String) key);
+                        String answerBody = (String) temp.get("body");
+                        String answerName = (String) temp.get("name");
+                        String answerUid = (String) temp.get("uid");
+                        Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
+                        answerArrayList.add(answer);
+                    }
+                }
 
-                mQuestionArrayList.add(question);
+                Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
+                if (mFavoriteQuestionUidList.contains(dataSnapshot.getKey())) {
+
+                    mQuestionArrayList.add(question);
+                }
+                mAdapter.notifyDataSetChanged();
             }
-            mAdapter.notifyDataSetChanged();
         }
 
         @Override
